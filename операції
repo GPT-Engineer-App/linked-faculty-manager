@@ -1,0 +1,104 @@
+#include <iostream>
+#include <string>
+
+class Faculty {
+public:
+    std::string name;
+    std::string dean;
+    int num_groups;
+    int total_students;
+    Faculty* next;
+
+    Faculty(const std::string& name, const std::string& dean, int num_groups, int total_students)
+        : name(name), dean(dean), num_groups(num_groups), total_students(total_students), next(nullptr) {}
+};
+
+class University {
+private:
+    Faculty* head;
+
+public:
+    University() : head(nullptr) {}
+
+    ~University() {
+        while (head) {
+            Faculty* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void add_faculty(const std::string& name, const std::string& dean, int num_groups, int total_students) {
+        Faculty* new_faculty = new Faculty(name, dean, num_groups, total_students);
+        new_faculty->next = head;
+        head = new_faculty;
+    }
+
+    void add_group(const std::string& faculty_name) {
+        Faculty* current = head;
+        while (current) {
+            if (current->name == faculty_name) {
+                current->num_groups++;
+                return;
+            }
+            current = current->next;
+        }
+        std::cout << "Faculty not found.\n";
+    }
+
+    void del_group(const std::string& faculty_name) {
+        Faculty* current = head;
+        while (current) {
+            if (current->name == faculty_name) {
+                if (current->num_groups > 0) {
+                    current->num_groups--;
+                } else {
+                    std::cout << "No groups to delete.\n";
+                }
+                return;
+            }
+            current = current->next;
+        }
+        std::cout << "Faculty not found.\n";
+    }
+
+    int calc_stud(const std::string& faculty_name) {
+        Faculty* current = head;
+        while (current) {
+            if (current->name == faculty_name) {
+                return current->total_students;
+            }
+            current = current->next;
+        }
+        std::cout << "Faculty not found.\n";
+        return 0;
+    }
+
+    void print_faculties() {
+        Faculty* current = head;
+        while (current) {
+            std::cout << "Faculty: " << current->name << ", Dean: " << current->dean << ", Groups: " << current->num_groups << ", Students: " << current->total_students << "\n";
+            current = current->next;
+        }
+    }
+};
+
+int main() {
+    University uni;
+    uni.add_faculty("Computer Science", "Dr. Smith", 5, 200);
+    uni.add_faculty("Mathematics", "Dr. Johnson", 3, 120);
+
+    uni.print_faculties();
+
+    std::cout << "Adding a group to Computer Science.\n";
+    uni.add_group("Computer Science");
+    uni.print_faculties();
+
+    std::cout << "Deleting a group from Mathematics.\n";
+    uni.del_group("Mathematics");
+    uni.print_faculties();
+
+    std::cout << "Total students in Computer Science: " << uni.calc_stud("Computer Science") << "\n";
+
+    return 0;
+}
